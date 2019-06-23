@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { Form, Icon, Input, Button } from 'antd';
+import { reqLogin } from '../../api';
+
+import './index.less';
 
 // 缓存
 const Item = Form.Item;
@@ -11,12 +14,21 @@ class Login extends Component {
   login = (e) => {
     e.preventDefault();
     // 进行校验
-    this.props.form.validateFields((errors, values) => {
+    this.props.form.validateFields(async (errors, values) => {
       if (!errors) {
+        // 校验成功
         const { username, password } = values;
-        console.log(`用户名：${username} 密码：${password}`);
+        // 发起登陆请求
+        const result = await reqLogin(username, password);
+        if (result) {
+          // 登陆成功，跳转首页
+          this.props.history.replace('/');
+        } else {
+          // 登陆失败，清空密码
+          this.props.form.resetFields(['password']);
+        }
       } else {
-        console.log('登录表单校验失败 ', errors);
+        console.log('登录表单校验失败');
       }
     })
   }
